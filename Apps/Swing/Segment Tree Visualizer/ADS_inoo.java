@@ -9,6 +9,8 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 
 public class ADS_inoo  {  
@@ -18,13 +20,15 @@ public class ADS_inoo  {
     int elements ;
     JFrame frame  ;
     JPanel upper ,lower; 
-    JLabel addPosL , addElementL ,addNL  , queryLl, queryHl ; 
+    JLabel addPosL , addElementL ,addNL  , queryLl, queryHl ,querySum; 
     JTextArea addPos ,addElement, addN, queryL , queryH ;
     
     JButton query, update ; 
     Double rows ;
     int LOCATION_TO_ADD; 
     int n ;
+    
+    int entered_elements ;
     
     Vector<Integer> v ;
     ADS_inoo(){ 
@@ -33,24 +37,21 @@ public class ADS_inoo  {
         queryLl =  new JLabel("Enter Lower bound") ; 
         queryHl =  new JLabel("Enter Higher bound"); 
         
-        queryLl.setBounds(70,100, 120,20);
-        queryL.setBounds(190,100,100,20);  
+        queryLl.setBounds(80,105, 120,20);
+        queryL.setBounds(190,100,60,30);  
         
-        queryLl.setOpaque(true) ;
-        queryLl.setForeground(Color.WHITE); 
-        queryLl.setBackground(Color.DARK_GRAY);
-        queryHl.setBackground(Color.DARK_GRAY);
 
-        queryHl.setOpaque(true) ; 
         queryHl.setForeground(Color.WHITE); 
+        queryLl.setForeground(Color.WHITE); 
+
         
-        queryHl.setBounds(350, 100, 120, 20);
-        queryH.setBounds(470,100,100,20); 
+        queryHl.setBounds(360, 105, 110, 20);
+        queryH.setBounds(470,100,60,30); 
        
-       
+        querySum =  new JLabel("Query Sum :  "); 
+        querySum.setBounds(100,80, 100, 40);
         
-        
-        frame = new JFrame("GridBagLayoutExample");
+        frame = new JFrame("Segment Visualizer in Swing");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
          addPosL =  new JLabel("Add position to update") ;   
@@ -58,32 +59,47 @@ public class ADS_inoo  {
          addNL  =  new JLabel("Enter Number of Elements") ;   
          
          
+         
          addPos = new JTextArea("",1,4); 
          addElement  = new JTextArea("" ,1,4) ;
          addN = new JTextArea("",1,4) ;
+        
+         addPosL.setBounds(840,100,120,30); 
+         addPosL.setForeground(Color.WHITE);
          
-//         addPos.setBounds(elements, elements, BUTTON_WIDTH, elements);
+         addPos.setBounds(960,100,80,30);
+         addElementL.setBounds(1100,100,120,30);
+         addElement.setBounds(1215,100,60,30);
+        addElementL.setForeground(Color.WHITE);
+        addNL.setBounds(500,80, 150,40);
+        addN.setBounds(650, 85,60,30) ;
+        
+        
+        JButton generate =  new JButton("Generate") ;
+        generate.setBounds(755, 75 ,100,50);
+        
         
         upper =  new JPanel();
-        lower = new JPanel() ; 
+        lower =  new JPanel() ; 
         
        
-        Border blackline = BorderFactory.createLineBorder(Color.BLUE);
+        Border blackline = BorderFactory.createLineBorder(Color.DARK_GRAY);
         
         
         
         upper.setPreferredSize(new Dimension(1500, 200));
         lower.setPreferredSize(new Dimension(1500, 600));
-      
-        upper.setBackground(Color.DARK_GRAY);
-        lower.setBackground(Color.WHITE) ;
+        
+        Color  bc = new Color (102, 0, 204);
+        
+        upper.setBackground(bc);
+        bc = new Color (102, 178, 255);
+        lower.setBackground(bc) ;
         
      
         query  =  new JButton("query"); 
         update =  new JButton("update") ; 
         
-        query.setOpaque(true);
-        update.setOpaque(true); 
         
         query.setBounds(750/2-100,40,150,50);
         update.setBounds(750+275,40,150,50);  
@@ -94,14 +110,30 @@ public class ADS_inoo  {
         upper.add(queryHl) ;
         upper.add(queryL);
         upper.add(queryH); 
-         
+        upper.add(addPosL);
+        upper.add(addPos);
         
+        upper.add(addElementL);
+        upper.add(addElement);
+        
+        lower.add(querySum) ;
+        lower.add(addNL);
+        lower.add(addN); 
+        lower.add(generate); 
         lower.setLayout(null);
         
         //600 
+         JLabel[]l  = new JLabel[300]; 
+         
+     
+
         
-         n = Integer.parseInt( JOptionPane.showInputDialog(frame,"Enter Number of Elements","INPUT ",JOptionPane.INFORMATION_MESSAGE));
-        rows = 0.0 ;
+        generate.addActionListener(new ActionListener(){
+        @Override
+        public void actionPerformed(ActionEvent e) {
+         n = Integer.parseInt(addN.getText());
+         entered_elements = n  ;
+         rows = 0.0 ;
         
         while( Math.pow(2,rows)<n){
            rows++ ;
@@ -110,10 +142,7 @@ public class ADS_inoo  {
         rows++ ;
         
         elements = (int)Math.pow(2,rows) ;
-        JLabel[]l  = new JLabel[300]; 
         
-       
-       
        int x   ; 
        int y  = 200 ;
        int h  = 40 ;
@@ -132,8 +161,9 @@ public class ADS_inoo  {
               
               l[counter].setBounds(x,y, w,h) ;
               l[counter].setBorder(blackline);
-              l[counter].setForeground(Color.BLACK);
-           
+              l[counter].setForeground(Color.WHITE);
+              l[counter].setBackground(Color.lightGray);
+              l[counter].setOpaque(true);
               lower.add(l[counter]) ;
               counter++ ;
              
@@ -143,20 +173,31 @@ public class ADS_inoo  {
           y+= 50 ;
        }
         
-       elements = counter ;
+        elements = counter ;
 
+        lower.revalidate();
+        lower.repaint();
+            }
+        });
+       
+       
        
     update.addActionListener(new ActionListener() { 
      int current; 
      @Override 
      
        public void actionPerformed(ActionEvent e)
-       {
+       { 
+           
            v =   new Vector<>();
            current = 0 ;
-           int n = Integer.parseInt( JOptionPane.showInputDialog(frame,"Location to insert","INPUT ",JOptionPane.INFORMATION_MESSAGE));
+           int n = Integer.parseInt(addPos.getText());
            
-           int low = 0 , high = (int)Math.pow(2,rows-1)  ; 
+           if(n>entered_elements || n<1){
+               JOptionPane.showMessageDialog(null, "position should be between  " + "1" + "and " +  entered_elements, "ERROR", JOptionPane.WARNING_MESSAGE);
+               return ;
+           }
+           int low = 0 , high = (int)Math.pow(2,rows-1) ; 
            
            while(true){  
                //  HOME 
@@ -185,19 +226,22 @@ public class ADS_inoo  {
             @Override
             public void run() {
                 if(c == v.size()){
-                 int addValue = Integer.parseInt( JOptionPane.showInputDialog(null,"Enter element","INPUT ",JOptionPane.INFORMATION_MESSAGE));
+                    l[v.get(v.size()-1)].setBackground(Color.GREEN);
+                 int addValue = Integer.parseInt(addElement.getText());
                  l[v.get(v.size()-1)].setText(Integer.toString(addValue)); 
-                 l[v.get(v.size()-1)].setBackground(Color.WHITE);
+                 l[v.get(v.size()-1)].setForeground(Color.WHITE);
+                 l[v.get(v.size()-1)].setBackground(Color.lightGray);
+               
                  cancel();
+                 return ;
                 }
                 else{ 
-                // Change the button's color to the next color in the array
                 l[v.get(c)].setBackground(Color.GREEN) ; 
                 l[v.get(c)].setOpaque(true) ;
                 c++;
                 }
             }
-            }, 0, 100);
+            }, 0, 200);
         
         
         
@@ -207,59 +251,121 @@ public class ADS_inoo  {
             public void run() {
                 if(c == -1){
                    cancel();
+                   return ;
                 }
                 
                 int left  = Integer.parseInt( l[v.get(c)*2+1].getText()) , right = Integer.parseInt( l[v.get(c)*2+2].getText()); 
                 int sum = left+right; 
-                System.out.println(sum);
                 l[v.get(c)].setText(Integer.toString(sum)) ; 
-                l[v.get(c)].setBackground(Color.WHITE) ; 
+                l[v.get(c)].setForeground(Color.WHITE);
+                l[v.get(c)].setBackground(Color.lightGray);
                 l[v.get(c)].setOpaque(true) ;
                 c-- ;
             }
             
-            }, 2000, 100);
+            }, 2000, 200);
         }
        });
        
     
     query.addActionListener(new ActionListener(){
            
-            int l =2;  
-            int r = 4;
             int sum = 0 ;
-            
             Stack<vec>s ; 
             
-             @Override
+            @Override
             public void actionPerformed(ActionEvent e) { 
+                sum =0 ;
+                v = new Vector<>();
+                v.clear(); 
                 s =  new Stack<>() ; 
-                s.add(new vec(0,0,n-1));              
+                 // si ss se
+                s.add(new vec(0,1,(int)Math.pow(2,rows-1)));           
+                
+
+               int qs  = Integer.parseInt(queryL.getText()) ; 
+               int qe  = Integer.parseInt(queryH.getText()) ; 
+               
+               if(qs<1 || qe > entered_elements){
+                   JOptionPane.showMessageDialog(null, "query should be between " + "1" + " and " + entered_elements, "error", JOptionPane.WARNING_MESSAGE);
+                   return  ;
+                   
+               }
+               System.out.print(qs+ " " + qe) ; 
                
                 while(!s.empty())
                 {   
                     vec curr = s.pop() ;
-                    int start  = curr.ss ;
-                    int end = curr.se ; 
+                    int ss  = curr.ss ;
+                    int se = curr.se ; 
                     int si = curr.si ; 
-                    System.out.println(si + " " + start + " " +end + " " +l + " "+r);
-                    if(r<start || end<l){
-                        continue ;
-                    }
-                    if(l>=start && r<=end){
-                        sum+=si ;
+                    
+                    
+                    if(qe<ss || se<qs){
                         continue ;
                     }
                     
-                 int mid = (start + end) / 2;
-                 s.add(new vec(2*si+1 , start,mid)) ;
-                 s.add(new vec(2*si+2 , mid+1,end)) ;
+                    if(qs<=ss && se<=qe){
+                        v.add(si);
+                        sum+= Integer.parseInt(l[si].getText()) ;
+                        continue ;
+                    }
+                    
+                    
+     
+                 int mid = (ss + se) / 2;
+                  // si ss se
+                 if(2*si+1<elements) s.add(new vec(2*si+1 , ss,mid)) ;
+                 if(2*si+2<elements)  s.add(new vec(2*si+2 , mid+1,se)) ;
 
                 }
                 
-                queryL.setText(Integer.toString(sum));
+
+
+
+        java.util.Timer timer = new java.util.Timer();
+        timer.schedule(new TimerTask() {
+            int c =0  ;
+            @Override
+            public void run() {
+                if(c >= v.size()){
+                     return ;
+                }
+                else{ 
+                // Change the button's color to the next color in the array
+                l[v.get(c)].setBackground(Color.RED) ; 
+                l[v.get(c)].setOpaque(true) ;
+                c++;
+                }
             }
-   
+            }, 0, 100);
+             
+             
+             querySum.setText("Query Sum : " +sum);
+             
+             
+            timer.schedule(new TimerTask() {
+            int c =0  ;
+            @Override
+            public void run() {
+                if(c >= v.size()){
+                     return ;
+                }
+                else{ 
+                // Change the button's color to the next color in the array
+                l[v.get(c)].setBackground(Color.lightGray) ; 
+                l[v.get(c)].setOpaque(true) ;
+                c++;
+                }
+            }
+            }, 4000, 100);
+             
+             
+             
+            }
+            
+            
+            
     });
        
         upper.setLayout(null); 
@@ -274,6 +380,19 @@ public class ADS_inoo  {
     }
     
     public static void main(String[] args) {
+        
+        try {
+        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                UIManager.setLookAndFeel(info.getClassName());
+                break;
+            } else {
+                UIManager.setLookAndFeel  ("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            }
+        }
+    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+        // If Nimbus is not available, you can set to another look and feel.
+    }
        new ADS_inoo();
     }
 
@@ -281,34 +400,12 @@ public class ADS_inoo  {
 }
 
 
-/*
-int query(int node, int start, int end, int l, int r)
-{
-    if(r < start or end < l)
-    {
-        // range represented by a node is completely outside the given range
-        return 0;
-    }
-    if(l <= start and end <= r)
-    {
-        // range represented by a node is completely inside the given range
-        // ADD to stack and color 
-        return tree[node];
-    }
-    // range represented by a node is partially inside and partially outside the given range
-    int mid = (start + end) / 2;
-    int p1 = query(2*node, start, mid, l, r);
-    int p2 = query(2*node+1, mid+1, end, l, r);
-    return (p1 + p2);
-} 
-
-*/
-
  class vec{
     int si  ;
     int se ;
     int ss ; 
     
+    // si ss se
     vec(int x,int y,int z) {
         
         this.si = x ;
